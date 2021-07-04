@@ -2,13 +2,13 @@
 
 Service to transform the Dutch AHN digital surface model (DSM) WCS service to mapbox-gl compatible terrain DEM tiles
 
-The Dutch AHN serves a DSM as a float32 geotiff raster as a Web Coverage Service (WCS). These rasters cannot be directly handled in mapbox-gl. Mapbox-gl has support for digital terrain models encoded as RGB in PNG images. This service translates the float32 raster values into mapbox compatible PNG RGB values.
+The Dutch AHN serves a DSM as a float32 geotiff raster through a Web Coverage Service (WCS). These rasters cannot be directly handled in mapbox-gl. Mapbox-gl has support for digital terrain models encoded as RGB in PNG images. This service translates the float32 raster values into mapbox compatible PNG RGB values.
 
 ## Prerequisites
 * git
 * node 14+
 
-## Installatiion
+## Installation
 ```bash
 git clone this_repository
 cd this_repository
@@ -16,7 +16,7 @@ npm install
 node wcs2png.js
 ```
 
-# usage
+## usage
 Point your browser to http://localhost:3110/tile/13/4208/2691 for an example PNG mapbox-gl compatible terrain tile
 
 The mapbox-gl layer definition looks like this:
