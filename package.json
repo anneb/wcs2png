@@ -1,0 +1,22 @@
+{
+  "name": "ahn2mbterrainrgbjs",
+  "version": "1.0.0",
+  "description": "convert remote wcs geotiff to png mapbox terrain",
+  "main": "wcs2png.js",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.17.1",
+    "geotiff": "^1.0.4",
+    "node-fetch": "^2.6.1",
+    "pngjs": "^6.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.9"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx nodemon wcs2png.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
