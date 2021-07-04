@@ -1,21 +1,39 @@
 import express from 'express';
-import geotiff, {fromArrayBuffer, fromUrl} from 'geotiff';
+import cors from 'cors';
+import {fromArrayBuffer} from 'geotiff';
 import {PNG} from 'pngjs'
 import fetch from 'node-fetch';
  
 const app = express();
- 
-app.listen(3000, () =>
-  console.log('Example app listening on port 3000!'),
+
+app.use(cors());
+
+let port = 3310;
+
+app.listen(port, () =>
+  console.log(`listening on port ${port}`),
 );
 
+function tileToBbox(z, x, y) {
+    let zp = 2 << z-1;
+    let size = 40075016.6855784 / zp;
+    let gx = (size * x) - (40075016.6855784/2);
+    let gy = (40075016.6855784/2) - (size * y);
+    return `${gx},${gy-size},${gx+size},${gy}`
+}
+
+
 app.get("/tile/:z/:x/:y", async (req, res)=>{
-    let url = "https://geodata.nationaalgeoregister.nl/ahn3/wcs?service=WCS&REQUEST=GETCOVERAGE&version=1.0.0&COVERAGE=ahn3_5m_dsm&FORMAT=image%2Ftiff&CRS=EPSG%3A3857&BBOX=546677.6262955815,6865879.628687672,547900.6187481433,6867102.621140234&WIDTH=512&HEIGHT=512";
     try {
+        let bbox = tileToBbox(parseInt(req.params.z), parseInt(req.params.x), parseInt(req.params.y));
+        let coverage = parseInt(req.params.z) < 14 ? 'ahn3_5m_dsm': 'ahn3_05m_dsm';
+        let url = `https://geodata.nationaalgeoregister.nl/ahn3/wcs?service=WCS&REQUEST=GETCOVERAGE&version=1.0.0&COVERAGE=${coverage}&FORMAT=image%2Ftiff&CRS=EPSG%3A3857&BBOX=${bbox}&WIDTH=512&HEIGHT=512`;
+    
         //const tiff = await fromUrl(url); // error server sent full file
+        
         const response = await fetch(url);
         if (!response.ok) {
-            res.json({error: 'fetch response not ok'});
+            res.status(500).json({error: 'fetch response not ok'});
             return;
         }
         const arrayBuffer = await response.arrayBuffer();
@@ -24,16 +42,7 @@ app.get("/tile/:z/:x/:y", async (req, res)=>{
         const image = await tiff.getImage();
         const width = image.getWidth();
         const height = image.getHeight();
-        const tileWidth = image.getTileWidth();
-        const tileHeight = image.getTileHeight();
-        const samplesPerPixel = image.getSamplesPerPixel();
-    
-        // when we are actually dealing with geo-data the following methods return
-        // meaningful results:
-        const origin = image.getOrigin();
-        const resolution = image.getResolution();
-        const bbox = image.getBoundingBox();
-
+        
         const data = await image.readRasters();
 
         let png = new PNG({
@@ -52,20 +61,8 @@ app.get("/tile/:z/:x/:y", async (req, res)=>{
                 png.data[idx+3] = 255; // alpha
             }
         }
-       png.pack().pipe(res);
-        return;
-        res.json({
-            width: width, 
-            height: height, 
-            tileWidth: tileWidth, 
-            tileHeight: tileHeight, 
-            samplesPerPixel: samplesPerPixel,
-            origin: origin,
-            resolution: resolution,
-            bbox: bbox,
-            data: data
-        });
+        png.pack().pipe(res);
     } catch(err) {
-        res.json({error: err.message});
+        res.status(500).json({error: err.message});
     }  
 })
