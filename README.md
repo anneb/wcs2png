@@ -31,6 +31,8 @@ The mapbox-gl layer definition looks like this:
         "tiles": [
         "http://localhost:3110/tile/{z}/{x}/{y}"
         ],
+        "maxzoom": 20,
+        "bounds": [3.20009, 50.7167, 7.27283, 53.5571],
         "attribution": "AHN"
     },
     "paint": {
