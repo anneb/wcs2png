@@ -53,8 +53,13 @@ app.get("/tile/:z/:x/:y", async (req, res)=>{
 
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
+                let floatval = data[0][y * width + x];
+                if (floatval > 10000) {
+                    // no data
+                    floatval = -7;
+                }
                 let idx = (y * width + x) * 4;
-                let rgb = Math.round(10000 + (data[0][y * width + x]) * 10);
+                let rgb = Math.round(10000 + (floatval) * 10);
                 png.data[idx] = (rgb >> 16) & 255; // red
                 png.data[idx+1] = (rgb >> 8) & 255; // green
                 png.data[idx+2] = (rgb) & 255; // blue
