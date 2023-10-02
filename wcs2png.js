@@ -26,8 +26,12 @@ function tileToBbox(z, x, y) {
 app.get("/tile/:z/:x/:y", async (req, res)=>{
     try {
         let bbox = tileToBbox(parseInt(req.params.z), parseInt(req.params.x), parseInt(req.params.y));
-        let coverage = parseInt(req.params.z) < 14 ? 'ahn3_5m_dsm': 'ahn3_05m_dsm';
-        let url = `https://service.pdok.nl/rws/ahn3/wcs/v1_0?service=WCS&REQUEST=GETCOVERAGE&version=1.0.0&COVERAGE=${coverage}&FORMAT=image%2Ftiff&CRS=EPSG%3A3857&BBOX=${bbox}&WIDTH=512&HEIGHT=512`
+        //let coverage = parseInt(req.params.z) < 14 ? 'ahn3_5m_dsm': 'ahn3_05m_dsm';
+        //let coverage = parseInt(req.params.z) < 14 ? 'ahn3_5m_dtm': 'ahn3_05m_dtm';
+        //let url = `https://service.pdok.nl/rws/ahn3/wcs/v1_0?service=WCS&REQUEST=GETCOVERAGE&version=1.0.0&COVERAGE=${coverage}&FORMAT=image%2Ftiff&CRS=EPSG%3A3857&BBOX=${bbox}&WIDTH=512&HEIGHT=512`
+
+        let coverage = 'dsm_05m';
+        let url = `https://service.pdok.nl/rws/ahn/wcs/v1_0?service=WCS&REQUEST=GETCOVERAGE&version=1.0.0&COVERAGE=${coverage}&FORMAT=image%2Ftiff&CRS=EPSG%3A3857&BBOX=${bbox}&WIDTH=512&HEIGHT=512`
     
         //const tiff = await fromUrl(url); // error server sent full file
         
@@ -54,12 +58,12 @@ app.get("/tile/:z/:x/:y", async (req, res)=>{
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
                 let floatval = data[0][y * width + x];
-                if (floatval > 10000) {
-                    // no data
+                if (floatval > 10000 || floatval < -9998) {
+                    // Both MAX_FLOAT4 and -9999 mean no data 
                     floatval = -7;
                 }
                 let idx = (y * width + x) * 4;
-                let rgb = Math.round(10000 + (floatval) * 10);
+                let rgb = Math.round((10000 + floatval) * 10);
                 png.data[idx] = (rgb >> 16) & 255; // red
                 png.data[idx+1] = (rgb >> 8) & 255; // green
                 png.data[idx+2] = (rgb) & 255; // blue

@@ -12,11 +12,11 @@
     "pngjs": "^6.0.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.9"
+    "nodemon": "^3.0.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx nodemon wcs2png.js"
+    "start": "nodemon wcs2png.js"
   },
   "author": "",
   "license": "ISC"
