@@ -40,6 +40,12 @@ app.get("/tile/:z/:x/:y", async (req, res)=>{
             res.status(500).json({error: 'fetch response not ok'});
             return;
         }
+        const contentType = response.headers.get('content-type');
+        console.log(contentType);
+        if (contentType && contentType.includes('xml')) {
+            // return not found
+            return res.status(404).end();
+        }
         const arrayBuffer = await response.arrayBuffer();
         const tiff = await fromArrayBuffer(arrayBuffer);    
         
