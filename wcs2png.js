@@ -8,10 +8,10 @@ const app = express();
 
 app.use(cors());
 
-let port = 3110;
+const port = process.env.WCS2PNG_PORT || process.env.PORT || 3110;
 
 app.listen(port, () =>
-  console.log(`listening on port ${port}`),
+  console.log(`wcs2png listening on port ${port}`),
 );
 
 function tileToBbox(z, x, y) {
